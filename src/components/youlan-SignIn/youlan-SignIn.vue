@@ -309,7 +309,7 @@
 	}
 </script>
 
-<style scoped>
+<style lang="scss" scoped>
 	.calendar-box {
 		width: 100%;
 		flex-direction: column;

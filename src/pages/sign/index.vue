@@ -10,36 +10,38 @@
       @change="signDate"
     />
     <!-- 抽奖弹窗 -->
-    <tm-modal v-model:show="signIn" :showFooter="false" height="auto">
-      <template #title>
-        <view class="modal-title text-size-xl">签到成功</view>
-        <view class="modal-subtitle text-size-n" v-if="!isHiding">
-          连续签到2天，获得抽奖一次
+    <up-modal v-model:show="signIn" :showFooter="false" height="auto">
+      <template #default>
+        <view class="w-full flex-col-center">
+          <view class="modal-title text-size-18">签到成功</view>
+          <view class="modal-subtitle text-size-12" v-if="!isHiding">
+            连续签到2天，获得抽奖一次
+          </view>
+        </view>
+        <view class="grid-container" v-if="!isHiding">
+          <LuckyGrid
+            class="lucky-grid"
+            ref="myLucky"
+            width="550rpx"
+            height="600rpx"
+            :blocks="blocks"
+            :prizes="prizes"
+            :buttons="buttons"
+            :defaultStyle="defaultStyle"
+            :activeStyle="activeStyle"
+            @start="startCallBack"
+            @end="endCallBack"
+          />
+        </view>
+        <view class="lucky-result" v-if="isHiding">
+          <image
+            class="lucky-result-image"
+            src="../../static/images/sign/star.png"
+          />
+          {{ resultText }}
         </view>
       </template>
-      <view class="grid-container" v-if="!isHiding">
-        <LuckyGrid
-          class="lucky-grid"
-          ref="myLucky"
-          width="550rpx"
-          height="600rpx"
-          :blocks="blocks"
-          :prizes="prizes"
-          :buttons="buttons"
-          :defaultStyle="defaultStyle"
-          :activeStyle="activeStyle"
-          @start="startCallBack"
-          @end="endCallBack"
-        />
-      </view>
-      <view class="lucky-result" v-if="isHiding">
-        <image
-          class="lucky-result-image"
-          src="../../static/images/sign/star.png"
-        />
-        {{ resultText }}
-      </view>
-    </tm-modal>
+    </up-modal>
   </view>
 </template>
 <script lang="ts" setup>

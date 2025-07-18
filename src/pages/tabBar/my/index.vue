@@ -1,3 +1,92 @@
+<script lang="ts" setup>
+import { onShow } from "@dcloudio/uni-app";
+import { ref, onMounted } from "vue";
+import { getAssetsImages } from "@/utils";
+import loginModal from "./loginModal.vue";
+import themeModal from "./themeModal.vue";
+import { useTheme } from "@/utils/theme";
+const { themeColors } = useTheme();
+const personalCenterList = ref([
+  {
+    title: "我的收藏",
+    icon: "my/icon_collection",
+    url: "/pages/sign/index",
+  },
+  {
+    title: "我的足迹",
+    icon: "my/icon_footprint",
+    url: "/pages/sign/index",
+  },
+  {
+    title: "发表文章",
+    icon: "my/icon_publish",
+    url: "/pages/sign/index",
+  },
+  {
+    title: "签到",
+    icon: "my/icon_sign",
+    url: "/pages/sign/index",
+  },
+]);
+const avatar = ref("");
+const currentSize = ref(0);
+const isLogin = ref(false);
+const isShowModal = ref(false);
+const showThemeModal = ref(false);
+
+onMounted(() => {
+  const token = uni.getStorageSync("token");
+  if (token) {
+    isLogin.value = true;
+  }
+  uni.$on("themeChanged", function (res) {
+    console.log(43, res, themeColors); //  为 B 页面传过来的值
+  });
+});
+
+onShow(() => {
+  uni.getStorageInfo({
+    success: (res) => {
+      console.log("getStorageInfo", res);
+      currentSize.value = res.currentSize;
+    },
+  });
+});
+
+// 登录
+const login = () => {
+  // isShowModal.value = true
+  uni.navigateTo({
+    url: "/pages/login/index",
+  });
+};
+
+// 选择头像
+const onChooseAvatar = (e: Event) => {
+  console.log("onChooseAvatar", e);
+  avatar.value = (e.detail as any).avatarUrl;
+};
+
+// 跳转页面
+const toPage = (url: string) => {
+  console.log("toPage", url);
+  uni.navigateTo({
+    url,
+  });
+};
+
+// 清除缓存
+const clearStorage = () => {
+  uni.clearStorage();
+  currentSize.value = 0;
+
+  uni.showToast({
+    title: "清除成功",
+    icon: "none",
+    duration: 1000,
+  });
+};
+</script>
 <template>
   <view>
     <!-- 页头区域 -->
@@ -6,8 +95,18 @@
         class="avatar-btn"
         open-type="chooseAvatar"
         @chooseavatar="onChooseAvatar"
+        v-if="isLogin"
       >
-        <image class="avatar" :src="avatar||getAssetsImages('avatar/animal','jpg')" />
+        <image
+          class="avatar"
+          :src="avatar || getAssetsImages('avatar/animal', 'jpg')"
+        />
+      </button>
+      <button class="avatar-btn" @tap="login" v-else>
+        <image
+          class="avatar"
+          :src="avatar || getAssetsImages('avatar/animal', 'jpg')"
+        />
       </button>
       <view class="username text-size-lg text-white text-weight-b"
         >YolkMen</view
@@ -36,130 +135,93 @@
         </view>
       </view>
       <!-- 设置中心 -->
-      <tm-sheet class="setting-center overflow" :padding="['0']">
-        <tm-cell
-          :bottomBorderInsert="true"
-          :card="false"
-          url="/pages/index/button"
-          icon="stack-line"
-          title="个人中心"
-        >
-          <template #avatar>
-            <image
-              class="setting-center-icon"
-              src="@/static/images/my/icon_setting.png"
-            />
-          </template>
-        </tm-cell>
-        <tm-cell
-          title="意见反馈"
-          :bottomBorderInsert="true"
-          :card="false"
-          icon="price-tag-3-line"
-          label="+￥32"
-          label-color="red"
-        >
-          <template #avatar>
-            <image
-              class="setting-center-icon"
-              src="@/static/images/my/icon_feedback.png"
-            />
-          </template>
-        </tm-cell>
-        <tm-cell
-          title="关于程序"
-          :bottomBorderInsert="true"
-          :card="false"
-          icon="chat-smile-2-line"
-          label="tmx测试"
-        >
-          <template #avatar>
-            <image
-              class="setting-center-icon"
-              src="@/static/images/my/icon_about.png"
-            />
-          </template>
-        </tm-cell>
-        <tm-cell
-          title="清除缓存"
-          :bottomBorderInsert="true"
-          :card="false"
-          :show-bottom-border="false"
-          icon="calendar-schedule-line"
-          :label="currentSize + 'kb'"
-          @click="clearStorage"
-        >
-          <template #avatar>
-            <image
-              class="setting-center-icon"
-              src="@/static/images/my/icon_clear.png"
-            />
-          </template>
-        </tm-cell>
-      </tm-sheet>
+      <up-card
+        class="setting-center overflow"
+        :head-border-bottom="false"
+        :padding="['0']"
+      >
+        <template #body>
+          <up-cell
+            :bottomBorderInsert="true"
+            :card="false"
+            isLink
+            url="/pages/index/button"
+            icon="setting"
+            title="个人中心"
+          >
+            <template #right-icon>
+              <image
+                class="setting-center-icon"
+                src="@/static/images/my/icon_setting.png"
+              />
+            </template>
+          </up-cell>
+          <up-cell
+            title="意见反馈"
+            :bottomBorderInsert="true"
+            :card="false"
+            isLink
+            icon="chat"
+          >
+            <template #right-icon>
+              <image
+                class="setting-center-icon"
+                src="@/static/images/my/icon_feedback.png"
+              />
+            </template>
+          </up-cell>
+          <up-cell
+            title="关于程序"
+            :bottomBorderInsert="true"
+            :card="false"
+            isLink
+            icon="file-text"
+          >
+            <template #right-icon>
+              <image
+                class="setting-center-icon"
+                src="@/static/images/my/icon_about.png"
+              />
+            </template>
+          </up-cell>
+          <up-cell
+            title="更换主题"
+            :bottomBorderInsert="true"
+            :card="false"
+            :show-bottom-border="false"
+            isLink
+            icon="tags"
+            @click="showThemeModal = true"
+          >
+            <template #right-icon>
+              <text class="theme-icon">🎨</text>
+            </template>
+          </up-cell>
+          <up-cell
+            :title="'清除缓存(' + currentSize + 'kb)'"
+            :bottomBorderInsert="true"
+            :card="false"
+            :show-bottom-border="false"
+            isLink
+            icon="trash"
+            @click="clearStorage"
+          >
+            <template #right-icon>
+              <image
+                class="setting-center-icon"
+                src="@/static/images/my/icon_clear.png"
+              />
+            </template>
+          </up-cell>
+        </template>
+      </up-card>
     </view>
+    <!-- 登录弹窗 -->
+    <loginModal v-model="isShowModal" />
+    <!-- 主题色弹窗 -->
+    <themeModal v-model="showThemeModal" />
   </view>
 </template>
-<script lang="ts" setup>
-import { onShow } from "@dcloudio/uni-app";
-import { ref } from "vue";
-import { getAssetsImages } from "@/utils";
-
-const personalCenterList = ref([
-  {
-    title: "我的收藏",
-    icon: "my/icon_collection",
-    url: "/pages/sign/index",
-  },
-  {
-    title: "我的足迹",
-    icon: "my/icon_footprint",
-    url: "/pages/sign/index",
-  },
-  {
-    title: "发表文章",
-    icon: "my/icon_publish",
-    url: "/pages/sign/index",
-  },
-  {
-    title: "签到",
-    icon: "my/icon_sign",
-    url: "/pages/sign/index",
-  },
-]);
-const avatar = ref("");
-const currentSize = ref(0);
-
-onShow(() => {
-  uni.getStorageInfo({
-    success: (res) => {
-      console.log("getStorageInfo", res);
-      currentSize.value = res.currentSize;
-    },
-  });
-});
-
-// 选择头像
-const onChooseAvatar = (e:Event) => {
-  console.log("onChooseAvatar", e);
-  avatar.value = (e.detail as any).avatarUrl;
-};
-
-// 跳转页面
-const toPage = (url:string) => {
-    console.log("toPage", url);
-  uni.navigateTo({
-    url,
-  });
-};
-
-// 清除缓存
-const clearStorage = () => {
-  uni.clearStorage();
-  currentSize.value = 0;
-};
-console.log(personalCenterList.value);
-</script>
 <style lang="scss" scoped>
 .page-head {
   height: 700rpx;
@@ -169,12 +231,15 @@ console.log(personalCenterList.value);
   align-items: center;
   background: url(https://jiudage-image-test.oss-cn-shenzhen.aliyuncs.com/dev/test/1737095802561pwfpquojwy_bg.png)
     top/100% 100% no-repeat;
+
   .avatar-btn {
     padding: 0;
     background-color: transparent;
+
     &::after {
       border: none !important;
     }
+
     .avatar {
       width: 150rpx;
       height: 150rpx;
@@ -189,6 +254,8 @@ console.log(personalCenterList.value);
 
 .page-body {
   padding: 16rpx;
+  background-color: var(--theme-background);
+  color: var(--theme-text);
 
   .personal-center {
     display: flex;
