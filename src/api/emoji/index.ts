@@ -21,7 +21,7 @@ export type EmojiListResult = {
 /** 获取Emoji表情包 */
 export const getEmojis = () => {
 	return request<EmojiListResult>({
-		url: "http://127.0.0.1:7575/app/emoji/list",
+		url: "app/emoji/list",
 		method: "POST",
 	});
 };

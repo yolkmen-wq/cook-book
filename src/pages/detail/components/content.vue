@@ -15,7 +15,6 @@ const author = ref("");
 const createdTime = ref("");
 const tags = ref([]);
 onMounted(() => {
-	console.log(18,props.id)
   getArticleDetail(props.id).then((res) => {
     title.value = res.data.title;
     content.value = res.data.content;
@@ -25,7 +24,7 @@ onMounted(() => {
 });
 </script>
 <template>
-  <view class="content">
+  <view class="content" :class="themeClass">
     <view class="title">{{ title }}</view>
     <view class="user-info">
       <view class="user-avatar">
@@ -33,9 +32,7 @@ onMounted(() => {
       </view>
       <view>
         <view class="user-name">作者：{{ author }}</view>
-        <view class="user-time"
-          >{{ formatTimeDifference(createdTime) }}</view
-        >
+        <view class="user-time">{{ formatTimeDifference(createdTime) }}</view>
       </view>
     </view>
     <view class="article-tags">标签：{{ tags }}</view>
@@ -44,7 +41,8 @@ onMounted(() => {
 </template>
 <style lang="scss" scoped>
 .title {
-  font-size: 32rpx;
+  color: $uni-text-color;
+   font-size: 32rpx;
   font-weight: bold;
   margin-bottom: 10px;
   text-align: left;
@@ -64,6 +62,7 @@ onMounted(() => {
   border-radius: 50%;
 }
 .user-name {
+  color: $uni-text-color;
   font-size: 26rpx;
   font-weight: bold;
 }
@@ -78,6 +77,7 @@ onMounted(() => {
   text-align: left;
 }
 .content-text {
+  color: $uni-text-color;
   font-size: 28rpx;
   line-height: 1.5;
   text-align: left;

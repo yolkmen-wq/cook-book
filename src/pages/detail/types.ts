@@ -41,4 +41,6 @@ export interface CommentListItem {
   rootCommentId: number;
   needExpand?: boolean;
   isExpanded?: boolean;
+  isLiked?: boolean;
+  likeCount?: number;
 }

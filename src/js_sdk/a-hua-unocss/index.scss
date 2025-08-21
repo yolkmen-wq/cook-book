@@ -1,15 +1,16 @@
 
 .bg-white{background-color:rgb(255,255,255)}
 .flex-shrink-0{flex-shrink:0}
-.flex-row-center-between{flex-direction:row;display:flex;justify-content:space-between;align-items:center}
-.flex-row-center{flex-direction:row;display:flex;align-items:center;justify-content:center}
-.flex-col{flex-direction:column}
 .flex-col-center{flex-direction:column;display:flex;align-items:center;justify-content:center}
+.flex-row-center{flex-direction:row;display:flex;align-items:center;justify-content:center}
+.flex-col-center-between{flex-direction:column;display:flex;justify-content:space-between;align-items:center}
+.flex-col{flex-direction:column}
 .flex-wrap{flex-wrap:wrap}
 .flex-row{flex-direction:row}
 .flex-center{display:flex;align-items:center;justify-content:center}
 .flex-1{flex:1}
 .font-bold{font-weight:bold}
+.flex-row-center-between{flex-direction:row;display:flex;justify-content:space-between;align-items:center}
 .flex{display:flex}
 .items-center{align-items:center}
 .justify-start{justify-content:start}
@@ -17,8 +18,10 @@
 .mr-10{margin-right:10rpx}
 .mt-12{margin-top:12rpx}
 .mb-16{margin-bottom:16rpx}
+.mb-12{margin-bottom:12rpx}
 .py-20{padding-top:20rpx;padding-bottom:20rpx}
 .py-10{padding-top:10rpx;padding-bottom:10rpx}
+.px-16{padding-left:16rpx;padding-right:16rpx}
 .px-20{padding-left:20rpx;padding-right:20rpx}
 .px-4{padding-left:4rpx;padding-right:4rpx}
 .pr-16{padding-right:16rpx}
@@ -27,6 +30,8 @@
 .relative{position:relative}
 .round-4{border-radius:4rpx}
 .round-3{border-radius:3rpx}
+.text-left{text-align:left}
+.top-0{top:0}
 .text-white{color:rgb(255,255,255)}
 .text-gray{color:rgb(128,128,128)}
 .text-36{font-size:36rpx}
@@ -36,13 +41,14 @@
 .gap-col-12{column-gap:12rpx}
 .gap-10{gap:10rpx}
 .sticky{position:sticky}
-.w-full{width:100%}
 .absolute{position:absolute}
+.left-0{left:0}
+.z-5{z-index:5}
+.w-full{width:100%}
 .overflow-hidden{overflow:hidden}
 
 
 
-.color-dot{color:dot}
 
 
 

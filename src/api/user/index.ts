@@ -34,6 +34,7 @@ export type CaptchaResult = {
 export type TokenResult = {
   success: boolean;
   message: string;
+  code: number;
   data: {
     /** `token` */
     token: string;
@@ -80,17 +81,16 @@ type ResultTable = {
 /** 登录 */
 export const getLogin = (data?: object) => {
   return request<UserResult>({
-    url: "http://127.0.0.1:7575/app/login",
+    url: "app/login",
     data: data,
     method: "POST",
   });
 };
 
 /** 微信登录 */
-export const getWxLogin = (data?: object) => {
+export const getWxLogin = (code: string) => {
   return request<TokenResult>({
-    url: "http://127.0.0.1:7575/app/wx-login",
-    data: data,
+    url: `app/wx-login?code=${code}`,
     method: "POST",
   });
 };
@@ -98,7 +98,7 @@ export const getWxLogin = (data?: object) => {
 /** 获取验证码 */
 export const getCaptcha = (data?: object) => {
   return request<CaptchaResult>({
-    url: "http://127.0.0.1:7575/app/get-captcha",
+    url: "app/get-captcha",
     method: "POST",
   });
 };

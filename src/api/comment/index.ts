@@ -20,7 +20,7 @@ export type CommentListResult = {
 /** 获取评论 */
 export const getComments = (data?: object) => {
   return request<CommentListResult>({
-    url: "http://127.0.0.1:7575/app/comment/list",
+    url: "app/comment/list",
     data: data,
     method: "POST",
   });
@@ -29,8 +29,24 @@ export const getComments = (data?: object) => {
 /** 创建评论 */
 export const createComment = (data?: object) => {
   return request<Result>({
-    url: "http://127.0.0.1:7575/app/comment/create",
+    url: "app/comment/create",
     data: data,
+    method: "POST",
+  });
+};
+
+/** 点赞 */
+export const likeComment = (id: number | string) => {
+  return request<Result>({
+    url: `app/comment/like/${id}`,
+    method: "POST",
+  });
+};
+
+/** 取消点赞 */
+export const unlikeComment = (id: number | string) => {
+  return request<Result>({
+    url: `app/comment/unlike/${id}`,
     method: "POST",
   });
 };

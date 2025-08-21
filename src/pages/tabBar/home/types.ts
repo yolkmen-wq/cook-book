@@ -3,7 +3,7 @@ interface ArticleListItem {
   categoryID: number;
   title: string;
   content: string; // 富文本 HTML 内容
-  cover: string; // 封面图 URL
+  coverImage: string; // 封面图 URL
   author: string;
   status: number; // 状态（可根据实际业务改用 0 | 1 | 2 等字面量类型）
   viewsCount: number; // 浏览计数

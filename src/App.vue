@@ -1,32 +1,58 @@
 <script lang="ts">
-import { onLaunch, onShow, onHide } from '@dcloudio/uni-app'
-import { themeManager, useTheme } from '@/utils/theme'
+import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
+import { themeManager, useTheme } from "@/utils/theme";
+import { getWxLogin } from "@/api/user";
 
 export default {
   onLaunch() {
-    console.log('App Launch')
-    
+    console.log("App Launch");
+
     // 初始化主题系统
-    themeManager.init()
-    
+    themeManager.init();
     // 在H5平台监听系统主题变化
     // #ifdef H5
-    const { watchSystemTheme } = useTheme()
-    watchSystemTheme()
+    const { watchSystemTheme } = useTheme();
+    watchSystemTheme();
+    // #endif
+    // #ifdef MP-WEIXIN
+    this.wxLogin();
     // #endif
   },
   onShow() {
-    console.log('App Show')
+    console.log("App Show");
   },
   onHide() {
-    console.log('App Hide')
-  }
-}
+    console.log("App Hide");
+  },
+  methods: {
+    /* 微信登录 */
+    wxLogin: () => {
+      // 微信登录逻辑
+      uni.login({
+        provider: "weixin",
+        success: async function (loginRes) {
+          console.log(loginRes.code);
+          // 获取到code后调用后端接口完成登录
+          const res = await getWxLogin(loginRes.code);
+          console.log(res);
+          if (res?.code === 200) uni.setStorageSync("token", res.data.token);
+        },
+        fail: function (err) {
+          console.error("微信登录失败:", err);
+          // uni.showToast({
+          //   title: "登录失败，请重试",
+          //   icon: "none",
+          // });
+        },
+      });
+    },
+  },
+};
 </script>
 
 <style lang="scss">
 // 导入uni.scss，包含主题系统和uview-plus变量
-@import './uni.scss';
+@import "./uni.scss";
 
 // 应用全局样式
 #app {

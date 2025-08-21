@@ -31,7 +31,7 @@ export type ArticleDetailResult = {
 /** 获取文章 */
 export const getArticles = (data ?: object) => {
 	return request<ArticleListResult>({
-		url: "http://127.0.0.1:7575/app/article/list",
+		url: "app/article/list",
 		data: data,
 		method: "POST",
 	});
@@ -40,7 +40,7 @@ export const getArticles = (data ?: object) => {
 /** 获取文章轮播图 */
 export const getCarousels = (position: number) => {
 	return request<Result>({
-		url: `http://127.0.0.1:7575/app/carousel/list?position=${position}`,
+		url: `app/carousel/list?position=${position}`,
 		method: "POST",
 	});
 };
@@ -48,7 +48,7 @@ export const getCarousels = (position: number) => {
 /** 获取文章分类 */
 export const getCategories = () => {
 	return request<ArticleListResult>({
-		url: "http://127.0.0.1:7575/app/categories/list",
+		url: "app/categories/list",
 		method: "POST",
 	});
 };
@@ -56,7 +56,7 @@ export const getCategories = () => {
 /** 通过分类获取文章 */
 export const getArticlesByCategory = (categoryID ?: number) => {
 	return request<ArticleListResult>({
-		url: `http://127.0.0.1:7575/app/articles/category/${categoryID}`,
+		url: `app/articles/category/${categoryID}`,
 		method: "POST",
 	});
 };
@@ -64,7 +64,7 @@ export const getArticlesByCategory = (categoryID ?: number) => {
 /** 获取最新文章 */
 export const getLatestArticles = (data ?: object) => {
 	return request<ArticleListResult>({
-		url: `http://127.0.0.1:7575/app/article/latest/list`,
+		url: `app/article/latest/list`,
 		method: "POST",
 		data: data,
 	});
@@ -73,7 +73,7 @@ export const getLatestArticles = (data ?: object) => {
 /** 获取文章详情 */
 export const getArticleDetail = (id : number) => {
 	return request<ArticleDetailResult>({
-		url: `http://127.0.0.1:7575/app/article/${id}`,
+		url: `app/article/${id}`,
 		method: "GET",
 	});
 };

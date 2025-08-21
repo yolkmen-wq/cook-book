@@ -9,11 +9,12 @@ defineOptions({
 });
 
 const props = defineProps<{ id: number }>();
+const emit = defineEmits
 
 async function onsubmit(e: any) {
   e.preventDefault();
   const res = await createComment({
-    articleId: props.id,
+    articleId: Number(props.id),
     content: form.commentContent,
   });
 }

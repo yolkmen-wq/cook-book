@@ -1,99 +1,4 @@
-<template>
-  <view class="home-page" :style="{ paddingTop: statusBarHeight + 'px' }">
-    <view
-      class="page-head center flex justify-start items-center flex-row-center-start"
-    >
-      <image class="avatar" src="../../../static/images/avatar/animal4.jpg" />
-      <up-search placeholder="请输入搜索关键词" v-model="keywords"> </up-search>
-    </view>
-    <view class="page-body">
-      <!-- 推荐列表 -->
-      <view class="recommend-list">
-        <view
-          class="recommend-item bg-white mt-12 round-3"
-          v-if="bannerList.length !== 0"
-        >
-          <e-swiper
-            :dotPosition="globalAppSettings.banner.dotPosition"
-            :autoplay="true"
-            :useDot="globalAppSettings.banner.useDot"
-            :list="bannerList"
-            @on-click="fnOnBannerClick"
-          ></e-swiper>
-        </view>
-      </view>
-      <!-- 精品分类 -->
-      <view class="category-list">
-        <view class="flex align-center justify-between mb-16">
-          <view class="sub-title">精品分类</view>
-          <image
-            class="arrow-icon"
-            src="../../../static/images/home/arrow.png"
-          />
-        </view>
-        <scroll-view class="category-scroll" scroll-x="true" scroll-left="120">
-          <view class="flex">
-            <view
-              class="category-item"
-              v-for="(item, index) in categoryList"
-              :key="index"
-            >
-              <image class="category-cover" :src="item.categoryPic" />
-              <view class="category-name pl-16 pr-16 pb-16">{{
-                item.name
-              }}</view>
-              <view class="category-count text-size-n"
-                >{{ item.articleNum }}篇</view
-              >
-            </view>
-          </view>
-        </scroll-view>
-      </view>
-      <!-- 最新文章 -->
-      <view class="latest-list">
-        <view class="flex align-center justify-between mb-16">
-          <view class="sub-title">最新文章</view>
-          <image
-            class="arrow-icon"
-            src="../../../static/images/home/arrow.png"
-          />
-        </view>
-        <up-card
-          class="latest-item"
-          v-for="(item, index) in latestList"
-          :key="index"
-          :head-border-bottom="false"
-          margin="30rpx 0"
-        >
-          <template #body>
-            <view class="latest-item-content">
-              <image class="latest-item-cover" :src="item.cover" />
-              <view>
-                <view class="latest-item-title text-36 font-bold">
-                  {{ item.title }}
-                </view>
-                <view class="latest-item-desc text-24 text-gray">
-                  <rich-text :nodes="item.content"></rich-text>>
-                </view>
-                <view class="flex align-center justify-between">
-                  <view class="lastest-item-date text-30 text-gray">
-                    {{ dayjs(item.createdTime).format("YYYY-MM-DD") }}
-                  </view>
-                  <view class="lastest-item-count text-30 text-gray">
-                    浏览<text class="text-size-g px-4">{{
-                      +item.viewsCount
-                    }}</text
-                    >次
-                  </view>
-                </view>
-              </view>
-            </view>
-          </template>
-        </up-card>
-      </view>
-    </view>
-  </view>
-</template>
+
 <script lang="ts" setup>
 import { ref, onMounted } from "vue";
 import eSwiper from "@/components/e-swiper/e-swiper.vue";
@@ -196,18 +101,129 @@ onMounted(() => {
   getArticleList();
 });
 </script>
+<template>
+  <!-- #ifdef MP -->
+  <view
+    class="home-page"
+    :class="themeClass"
+    :style="{ paddingTop: statusBarHeight + 'px' }"
+  >
+    <!-- #endif -->
+  <!-- #ifndef MP -->
+  <view
+    class="home-page"
+    :style="{ paddingTop: statusBarHeight + 'px' }"
+  >
+  <!-- #endif -->
+    <view
+      class="page-head center flex justify-start items-center flex-row-center-start"
+    >
+      <image class="avatar" src="../../../static/images/avatar/animal4.jpg" />
+      <up-search class="search-input" placeholder="请输入搜索关键词" v-model="keywords"> </up-search>
+    </view>
+    <view class="page-body">
+      <!-- 推荐列表 -->
+      <view class="recommend-list">
+        <view
+          class="recommend-item bg-white mt-12 mb-12 round-3"
+          v-if="bannerList.length !== 0"
+        >
+          <e-swiper
+            :dotPosition="globalAppSettings.banner.dotPosition"
+            :autoplay="true"
+            :useDot="globalAppSettings.banner.useDot"
+            :list="bannerList"
+            @on-click="fnOnBannerClick"
+          ></e-swiper>
+        </view>
+      </view>
+      <!-- 精品分类 -->
+      <view class="category-list">
+        <view class="flex-row-center-between mb-16">
+          <view class="sub-title">精品分类</view>
+          <image
+            class="arrow-icon"
+            src="../../../static/images/home/arrow.png"
+          />
+        </view>
+        <scroll-view class="category-scroll" scroll-x="true" scroll-left="120">
+          <view class="flex">
+            <view
+              class="category-item"
+              v-for="(item, index) in categoryList"
+              :key="index"
+            >
+              <image class="category-cover" :src="item.categoryPic" />
+              <view class="category-name pl-16 pr-16 pb-16">{{
+                item.name
+              }}</view>
+              <view class="category-count text-size-n"
+                >{{ item.articleNum }}篇</view
+              >
+            </view>
+          </view>
+        </scroll-view>
+      </view>
+      <!-- 最新文章 -->
+      <view class="latest-list">
+        <view class="flex-row-center-between mb-16">
+          <view class="sub-title">最新文章</view>
+          <image
+            class="arrow-icon"
+            src="../../../static/images/home/arrow.png"
+          />
+        </view>
+        <up-card
+          class="latest-item"
+          v-for="(item, index) in latestList"
+          :key="index"
+          :head-border-bottom="false"
+          margin="30rpx 0"
+        >
+          <template #body>
+            <view class="latest-item-content">
+              <image class="latest-item-cover" :src="item.coverImage" />
+              <view>
+                <view class="latest-item-title text-36 font-bold">
+                  {{ item.title }}
+                </view>
+                <view class="latest-item-desc text-24 text-gray">
+                  <rich-text :nodes="item.content"></rich-text>
+                </view>
+                <view class="flex align-center justify-between">
+                  <view class="lastest-item-date text-30 text-gray">
+                    {{ dayjs(item.createdTime).format("YYYY-MM-DD") }}
+                  </view>
+                  <view class="lastest-item-count text-30 text-gray">
+                    浏览<text class="text-size-g px-4">{{
+                      +item.viewsCount
+                    }}</text
+                    >次
+                  </view>
+                </view>
+              </view>
+            </view>
+          </template>
+        </up-card>
+      </view>
+    </view>
+  </view>
+</template>
 <style lang="scss" scoped>
 .home-page {
   padding: 32rpx;
-
+  background-color: $uni-bg-color;
   .avatar {
     width: 100rpx;
     height: 100rpx;
     border-radius: 50%;
-    margin-right: 50rpx;
+    margin-right: 40rpx;
   }
 
   .search-input {
+    :deep(.u-search__action){
+      color:$uni-text-color;
+    }
   }
 
   .search-icon {
@@ -218,6 +234,7 @@ onMounted(() => {
   }
 
   .sub-title {
+    color:$uni-text-color;
     &::before {
       content: "";
       display: inline-block;

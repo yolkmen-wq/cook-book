@@ -48,6 +48,7 @@
 import { ref, shallowRef } from "vue";
 import random from "random";
 import LuckyGrid from "@lucky-canvas/uni/lucky-grid"; // 九宫格
+
 import type { LuckyWheel } from "lucky-canvas/types";
 import youlanSignIn from "@/components/youlan-SignIn/youlan-SignIn.vue";
 
@@ -55,13 +56,12 @@ import youlanSignIn from "@/components/youlan-SignIn/youlan-SignIn.vue";
 const myLucky = shallowRef<LuckyWheel | null>(null);
 const resultText = ref("");
 const isHiding = ref(false);
-const actionImage = ref("../../static/images/sign/bg2.png");
 
 const blocks = [
   {
     imgs: [
       {
-        src: "../../static/images/sign/bg.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a71ae61e8.png",
         width: "100%",
         height: "100%",
       },
@@ -75,13 +75,13 @@ const prizes = [
     fonts: [{ text: "1积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -95,13 +95,13 @@ const prizes = [
     fonts: [{ text: "2积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -114,13 +114,13 @@ const prizes = [
     fonts: [{ text: "3积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -133,13 +133,13 @@ const prizes = [
     fonts: [{ text: "4积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -152,13 +152,13 @@ const prizes = [
     fonts: [{ text: "5积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -171,13 +171,13 @@ const prizes = [
     fonts: [{ text: "6积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -190,13 +190,13 @@ const prizes = [
     fonts: [{ text: "7积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -209,13 +209,13 @@ const prizes = [
     fonts: [{ text: "8积分", top: "40%", fontColor: "rgba(230, 175, 114,1)" }],
     imgs: [
       {
-        src: "../../static/images/sign/bg1.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a7476e096.png",
         width: "70%",
         height: "70%",
-        activeSrc: actionImage.value,
+        activeSrc: "https://youke1.picui.cn/s1/2025/07/23/6880a7622d89c.png",
       },
       {
-        src: "../../static/images/sign/coin.png",
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a77637d54.png",
         width: "136rpx",
         height: "136rpx",
         top: -10,
@@ -231,7 +231,11 @@ const buttons = [
       { text: "立即抽奖", top: "40%", fontColor: "#f0ff00", fontWeight: 700 },
     ],
     imgs: [
-      { src: "../../static/images/sign/bg.png", width: "100%", height: "100%" },
+      {
+        src: "https://youke1.picui.cn/s1/2025/07/23/6880a71ae61e8.png",
+        width: "100%",
+        height: "100%",
+      },
     ],
   },
   {},
@@ -245,12 +249,14 @@ const defaultStyle = {};
 // 开始游戏
 const startCallBack = () => {
   // 开始游戏
-  myLucky.value.play();
-  // 假设接口的请求速度是1s
-  setTimeout(() => {
-    // 停止游戏
-    myLucky.value.stop(0);
-  }, 1000);
+  if (myLucky.value) {
+    myLucky.value.play();
+    // 假设接口的请求速度是1s
+    setTimeout(() => {
+      // 停止游戏
+      myLucky.value.stop(0);
+    }, 1000);
+  }
 };
 
 // 结束游戏
@@ -259,7 +265,12 @@ const endCallBack = (prize: any) => {
   // 显示抽奖结果
   resultText.value = "恭喜中奖: " + prize.fonts[0].text;
   // 游戏结束触发 end 回调
-  alert("恭喜中奖: " + prize.fonts[0].text);
+  // alert("恭喜中奖: " + prize.fonts[0].text);
+  uni.showToast({
+    title: "恭喜中奖: " + prize.fonts[0].text,
+    icon: "none",
+    duration: 2000,
+  });
 };
 
 // 签到
@@ -279,6 +290,7 @@ const signDate = (v: string) => {
   integral.value = randomInteger;
   isIntegral.value = true;
   signIn.value = true;
+  myLucky.value.initLucky();
   console.log(v);
 };
 </script>

@@ -55,7 +55,7 @@ onMounted(async () => {
   console.log("onMounted");
   const systemInfo = uni.getSystemInfoSync();
   deviceWidth.value = systemInfo.windowWidth;
-  tabWidth.value = (deviceWidth.value - 36) / tabs.length; // 根据tab数量均分宽度
+  tabWidth.value = (deviceWidth.value - 30) / tabs.length; // 根据tab数量均分宽度
   statusBarHeight.value = systemInfo.statusBarHeight || 0;
   // 根据不同平台调整导航栏高度
   const platform = systemInfo.platform.toLowerCase();
@@ -72,18 +72,22 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <view class="container" :style="{ paddingTop: statusBarHeight + 'px' }">
+  <view
+    class="container"
+    :class="themeClass"
+    :style="{ paddingTop: statusBarHeight + 'px' }"
+  >
     <!-- 导航栏 -->
     <view
       class="custom-navbar flex flex-row"
       :style="{ height: navbarHeight + 'px' }"
     >
-      <tm-icon
-        name="arrow-left-s-line"
+      <up-icon
+        name="arrow-left"
         class="nav-icon"
         primary
         @tap="handleBack"
-      ></tm-icon>
+      ></up-icon>
       <view class="custom-navbar-brand flex-1">
         <view class="tabs-wrap flex flex-row">
           <view
@@ -133,7 +137,7 @@ onMounted(async () => {
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  background: #fff;
+  background: $uni-bg-color;
   position: relative;
 }
 
@@ -146,6 +150,9 @@ onMounted(async () => {
 
 .nav-icon {
   margin-right: 20rpx;
+  :deep(.u-icon__icon) {
+    color: $uni-text-color !important;
+  }
 }
 
 .custom-navbar-brand {
@@ -168,7 +175,7 @@ onMounted(async () => {
   transition: color 0.3s ease;
 
   &.active {
-    color: #000;
+    color: $uni-text-color;
     font-weight: 500;
   }
 }

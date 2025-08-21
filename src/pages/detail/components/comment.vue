@@ -1,6 +1,6 @@
 <script lang="ts" setup>
-import { onMounted, ref, computed, nextTick } from "vue";
-import { getComments } from "@/api/comment";
+import { onMounted, ref, nextTick } from "vue";
+import { getComments, likeComment, unlikeComment } from "@/api/comment";
 import { formatTimeDifference, getAssetsImages } from "@/utils";
 import type { CommentListItem } from "../types";
 import { getCurrentInstance } from "vue";
@@ -22,7 +22,7 @@ const toggleExpand = (index: number) => {
 const commentList = ref<CommentListItem[]>([]);
 const getCommentList = async () => {
   const res = await getComments({
-    articleId: props.id,
+    articleId: Number(props.id),
     pageSize: 30,
     pageNum: 1,
   });
@@ -32,7 +32,7 @@ const getCommentList = async () => {
     item.needExpand = false;
     // 添加点赞状态
     item.isLiked = false;
-    item.likeCount = Math.floor(Math.random() * 100); // 模拟点赞数
+    // item.likeCount = Math.floor(Math.random() * 100); // 模拟点赞数
   });
 };
 
@@ -53,7 +53,7 @@ const checkTextOverflow = async () => {
     try {
       if (res[i]) {
         // 假设每行高度约为 24px（根据实际字体大小调整）
-        const lineHeight = 20;
+        const lineHeight = 28; // 根据实际字体调整
         const maxHeight = lineHeight * 3; // 三行的高度
         if (res[i].height > maxHeight) {
           comment.needExpand = true;
@@ -69,7 +69,13 @@ const checkTextOverflow = async () => {
 function handleZan(index: number) {
   const comment = commentList.value[index];
   comment.isLiked = !comment.isLiked;
-  comment.likeCount += comment.isLiked ? 1 : -1;
+  comment.likeCount = (comment.likeCount || 0) + (comment.isLiked ? 1 : -1);
+  if (comment.isLiked) {
+    likeComment(comment.id);
+  } else {
+    unlikeComment(comment.id);
+  }
+
   console.log("点赞状态:", comment.isLiked ? "已点赞" : "取消点赞");
 }
 
@@ -82,8 +88,12 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <view class="comment-list">
-    <view class="comment-item" v-for="(item, index) in commentList" :key="index">
+  <view class="comment-list" :class="themeClass">
+    <view
+      class="comment-item"
+      v-for="(item, index) in commentList"
+      :key="index"
+    >
       <view class="comment-main">
         <view class="comment-avatar">
           <image
@@ -98,28 +108,44 @@ onMounted(async () => {
               <text class="comment-name">{{ item.userId || "用户昵称" }}</text>
               <text class="comment-vip" v-if="Math.random() > 0.7">VIP</text>
             </view>
-            <view class="comment-time">{{ formatTimeDifference("2025-06-25 12:00:00") }}</view>
+            <view class="comment-time">{{
+              formatTimeDifference("2025-06-25 12:00:00")
+            }}</view>
           </view>
-          <view
-            class="comment-content"
-            :class="{ 'overflow-hidden': !item.isExpanded && item.needExpand }"
-          >
-            {{ item.content || "这是一条评论内容，用来展示评论的样式效果。可能会很长，需要展开收起功能。" }}
-          </view>
-          <view
-            v-if="item.needExpand"
-            class="expand-button"
-            @click="toggleExpand(index)"
-          >
-            {{ item.isExpanded ? "收起" : "展开" }}
+          <view class="text-left">
+            <text
+              class="comment-content"
+              :class="{
+                'overflow-hidden': !item.isExpanded && item.needExpand,
+              }"
+            >
+              {{
+                item.content ||
+                "这是一条评论内容，用来展示评论的样式效果。可能会很长，需要展开收起功能。"
+              }}
+            </text>
+            <text
+              v-if="item.needExpand"
+              class="expand-button"
+              @click="toggleExpand(index)"
+            >
+              {{ item.isExpanded ? "收起" : "展开" }}
+            </text>
           </view>
           <view class="comment-actions">
             <view class="like-section" @tap="handleZan(index)">
               <image
                 class="like-icon"
-                :src="getAssetsImages(`detail/zan${item.isLiked ? '-actived' : ''}`, 'png')"
+                :src="
+                  getAssetsImages(
+                    `detail/zan${item.isLiked ? '-actived' : ''}`,
+                    'png'
+                  )
+                "
               />
-              <text class="like-count" v-if="item.likeCount > 0">{{ item.likeCount }}</text>
+              <text class="like-count" v-if="item.likeCount > 0">{{
+                item.likeCount
+              }}</text>
             </view>
           </view>
         </view>
@@ -129,61 +155,62 @@ onMounted(async () => {
 </template>
 <style lang="scss" scoped>
 .comment-list {
-  background-color: #1a1a1a;
+  background-color: $u-primary-light;
+  color: var(--theme-primary);
   padding: 0 32rpx;
-  
+
   .comment-item {
     padding: 24rpx 0;
     border-bottom: 1px solid #2a2a2a;
-    
+
     &:last-child {
       border-bottom: none;
     }
-    
+
     .comment-main {
       display: flex;
       align-items: flex-start;
       gap: 24rpx;
     }
-    
+
     .comment-avatar {
       width: 72rpx;
       height: 72rpx;
       border-radius: 50%;
       overflow: hidden;
       flex-shrink: 0;
-      
+
       .comment-avatar-img {
         width: 100%;
         height: 100%;
         object-fit: cover;
       }
     }
-    
+
     .comment-content-wrapper {
       flex: 1;
       min-width: 0;
     }
-    
+
     .comment-header {
       display: flex;
       align-items: center;
       justify-content: space-between;
       margin-bottom: 8rpx;
     }
-    
+
     .comment-user-info {
       display: flex;
       align-items: center;
       gap: 12rpx;
     }
-    
+
     .comment-name {
       font-size: 28rpx;
       color: #4a9eff;
       font-weight: 500;
     }
-    
+
     .comment-vip {
       background: linear-gradient(135deg, #ff6b35, #f7931e);
       color: #fff;
@@ -192,20 +219,22 @@ onMounted(async () => {
       border-radius: 6rpx;
       font-weight: bold;
     }
-    
+
     .comment-time {
       font-size: 24rpx;
       color: #666;
     }
-    
+
     .comment-content {
       font-size: 28rpx;
-      color: #e5e5e5;
+      color: $uni-text-color;
+      text-align: left;
       line-height: 1.5;
       margin-bottom: 16rpx;
       word-break: break-all;
+      white-space: pre-line; // 添加此行，合并空格但保留换行
     }
-    
+
     .overflow-hidden {
       overflow: hidden;
       text-overflow: ellipsis;
@@ -213,24 +242,25 @@ onMounted(async () => {
       -webkit-line-clamp: 3;
       -webkit-box-orient: vertical;
     }
-    
+
     .expand-button {
       font-size: 24rpx;
       color: #4a9eff;
+      text-align: left;
       margin-bottom: 16rpx;
       cursor: pointer;
-      
+
       &:hover {
         color: #6bb6ff;
       }
     }
-    
+
     .comment-actions {
       display: flex;
       justify-content: flex-end;
       align-items: center;
     }
-    
+
     .like-section {
       display: flex;
       align-items: center;
@@ -240,16 +270,16 @@ onMounted(async () => {
       background-color: rgba(255, 255, 255, 0.05);
       cursor: pointer;
       transition: all 0.2s ease;
-      
+
       &:hover {
         background-color: rgba(255, 255, 255, 0.1);
       }
-      
+
       .like-icon {
         width: 32rpx;
         height: 32rpx;
       }
-      
+
       .like-count {
         font-size: 24rpx;
         color: #999;

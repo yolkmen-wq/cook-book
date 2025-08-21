@@ -88,7 +88,7 @@ const clearStorage = () => {
 };
 </script>
 <template>
-  <view>
+  <view :class="themeClass">
     <!-- 页头区域 -->
     <view class="page-head">
       <button
@@ -254,8 +254,8 @@ const clearStorage = () => {
 
 .page-body {
   padding: 16rpx;
-  background-color: var(--theme-background);
-  color: var(--theme-text);
+  background-color: $uni-bg-color;
+  color: $uni-text-color-inverse;
 
   .personal-center {
     display: flex;
@@ -290,6 +290,10 @@ const clearStorage = () => {
       width: 48rpx;
       height: 48rpx;
     }
+  }
+
+  :deep(.u-cell__title-text) {
+    color: $uni-text-color-inverse!important;
   }
 }
 </style>

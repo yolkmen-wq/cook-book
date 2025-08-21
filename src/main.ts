@@ -3,6 +3,8 @@ import * as Pinia from "pinia";
 import App from "./App.vue";
 import "./mock";
 import uviewPlus, { setConfig } from "uview-plus";
+import { currentTheme } from "@/utils/theme";
+
 // 下面的在特殊场景下才需要配置，通常不用配置即可直接使用uvire-plus框架。
 // 调用setConfig方法，方法内部会进行对象属性深度合并，可以放心嵌套配置
 // 需要在app.use(uview-plus)之后执行
@@ -29,7 +31,16 @@ export function createApp() {
   const app = createSSRApp(App);
   app.use(Pinia.createPinia());
   app.use(uviewPlus);
-  return {
-    app,
-  };
+  // #ifdef MP
+  app.mixin({
+    computed: {
+      themeClass() {
+        console.log(36, currentTheme.value);
+        return `theme-${currentTheme.value}`; // 假设您将 currentTheme 暴露到全局
+      },
+    },
+  });
+  // #endif
+
+  return { app };
 }
