@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref, nextTick } from "vue";
+import { onMounted, ref, nextTick, computed } from "vue";
 import { getComments, likeComment, unlikeComment } from "@/api/comment";
 import { formatTimeDifference, getAssetsImages } from "@/utils";
 import type { CommentListItem } from "../types";
@@ -11,6 +11,13 @@ defineOptions({
 
 const props = defineProps<{ id: number }>();
 const instance = getCurrentInstance();
+
+// 主题类名
+const themeClass = computed(() => {
+  // 这里可以根据实际的主题状态来返回对应的类名
+  // 暂时默认返回浅色主题
+  return 'theme-light';
+});
 
 // 评论展开收起
 const isContentOverThreeLines = ref([]);
@@ -40,7 +47,7 @@ const getCommentList = async () => {
 const checkTextOverflow = async () => {
   await nextTick();
   // 获取文本元素的尺寸信息
-  const query = uni.createSelectorQuery().in(instance.proxy);
+  const query = uni.createSelectorQuery().in(instance?.proxy);
   query.selectAll(`.comment-content`).boundingClientRect();
   const res = await new Promise<any>((resolve) => {
     query.exec((data) => {
@@ -120,8 +127,7 @@ onMounted(async () => {
               }"
             >
               {{
-                item.content ||
-                "这是一条评论内容，用来展示评论的样式效果。可能会很长，需要展开收起功能。"
+                item.content
               }}
             </text>
             <text
@@ -143,8 +149,7 @@ onMounted(async () => {
                   )
                 "
               />
-              <text class="like-count" v-if="item.likeCount > 0">{{
-                item.likeCount
+              <text class="like-count" v-if="(item.likeCount || 0) > 0">{{                item.likeCount || 0
               }}</text>
             </view>
           </view>
@@ -155,13 +160,21 @@ onMounted(async () => {
 </template>
 <style lang="scss" scoped>
 .comment-list {
-  background-color: $u-primary-light;
-  color: var(--theme-primary);
+  background-color: var(--theme-background);
+  color: var(--theme-text);
   padding: 0 32rpx;
 
+  &.theme-light {
+    background-color: #ffffff;
+    
+    .comment-item {
+      border-bottom: 1px solid #f0f0f0;
+    }
+  }
+
   .comment-item {
-    padding: 24rpx 0;
-    border-bottom: 1px solid #2a2a2a;
+    padding: 32rpx 0;
+    border-bottom: 1px solid var(--theme-border);
 
     &:last-child {
       border-bottom: none;
@@ -207,8 +220,8 @@ onMounted(async () => {
 
     .comment-name {
       font-size: 28rpx;
-      color: #4a9eff;
-      font-weight: 500;
+      color: var(--theme-primary);
+      font-weight: 600;
     }
 
     .comment-vip {
@@ -222,17 +235,17 @@ onMounted(async () => {
 
     .comment-time {
       font-size: 24rpx;
-      color: #666;
+      color: var(--theme-text-secondary);
     }
 
     .comment-content {
       font-size: 28rpx;
-      color: $uni-text-color;
+      color: var(--theme-text);
       text-align: left;
-      line-height: 1.5;
+      line-height: 1.6;
       margin-bottom: 16rpx;
       word-break: break-all;
-      white-space: pre-line; // 添加此行，合并空格但保留换行
+      white-space: pre-line;
     }
 
     .overflow-hidden {
@@ -245,13 +258,14 @@ onMounted(async () => {
 
     .expand-button {
       font-size: 24rpx;
-      color: #4a9eff;
+      color: var(--theme-primary);
       text-align: left;
       margin-bottom: 16rpx;
       cursor: pointer;
+      opacity: 0.8;
 
       &:hover {
-        color: #6bb6ff;
+        opacity: 1;
       }
     }
 
@@ -267,12 +281,14 @@ onMounted(async () => {
       gap: 8rpx;
       padding: 8rpx 16rpx;
       border-radius: 20rpx;
-      background-color: rgba(255, 255, 255, 0.05);
+      background-color: var(--theme-surface);
       cursor: pointer;
       transition: all 0.2s ease;
+      border: 1px solid var(--theme-border);
 
       &:hover {
-        background-color: rgba(255, 255, 255, 0.1);
+        background-color: var(--theme-primary-light);
+        border-color: var(--theme-primary);
       }
 
       .like-icon {
@@ -282,7 +298,7 @@ onMounted(async () => {
 
       .like-count {
         font-size: 24rpx;
-        color: #999;
+        color: var(--theme-text-secondary);
         min-width: 20rpx;
       }
     }

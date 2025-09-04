@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { ref, reactive, onMounted } from "vue";
+import { ref, reactive, onMounted, computed } from "vue";
 import { getAssetsImages } from "@/utils";
 import EmojiPanel from "./emojiPanel.vue";
 import { createComment } from "@/api/comment";
@@ -9,14 +9,36 @@ defineOptions({
 });
 
 const props = defineProps<{ id: number }>();
-const emit = defineEmits
+const emit = defineEmits<{
+  refresh: [];
+}>();
+
+// 主题类名
+const themeClass = computed(() => {
+  // 这里可以根据实际的主题状态来返回对应的类名
+  // 暂时默认返回浅色主题
+  return 'theme-light';
+});
 
 async function onsubmit(e: any) {
   e.preventDefault();
-  const res = await createComment({
-    articleId: Number(props.id),
-    content: form.commentContent,
-  });
+  if (!form.commentContent.trim()) return;
+  
+  try {
+    const res = await createComment({
+      articleId: Number(props.id),
+      content: form.commentContent,
+    });
+    
+    // 清空输入框
+    form.commentContent = '';
+    // 关闭弹窗
+    closeModal();
+    // 通知父组件刷新评论列表
+    emit('refresh');
+  } catch (error) {
+    console.error('发送评论失败:', error);
+  }
 }
 const form = reactive({
   commentContent: "",
@@ -118,7 +140,7 @@ onMounted(() => {
 </script>
 <template>
   <view class="modal" @tap="closeModal" v-if="showModal"> </view>
-  <view id="commentBox" class="comment-box">
+  <view id="commentBox" class="comment-box" :class="themeClass">
     <view class="comment-edit-box flex-row-center-between">
       <view class="flex-1">
         <up-input
@@ -130,7 +152,7 @@ onMounted(() => {
             minHeight: '80rpx',
           }"
           placeholder="来说点什么吧~！"
-          placeholderStyle="color: #2a2a2c"
+          :placeholderStyle="themeClass === 'theme-light' ? 'color: #999999' : 'color: #2a2a2c'"
           border="none"
           v-model="form.commentContent"
           @focus="handleFocus"
@@ -160,7 +182,7 @@ onMounted(() => {
             </view>
           </template>
         </up-input>
-        <view v-if="isFocused" style="color: aliceblue">
+        <view v-if="isFocused" :style="{ color: themeClass === 'theme-light' ? '#333333' : 'aliceblue' }">
           <view v-for="(v, i) in imageList" :key="i">
             <image :src="v" class="image-item" />
           </view>
@@ -232,14 +254,20 @@ onMounted(() => {
   width: 100%;
   padding: 16px;
   box-sizing: border-box;
-  background-color: rgba(17, 17, 17, 1);
+  background-color: var(--theme-surface);
+  border-top: 1px solid var(--theme-border);
+  
+  &.theme-light {
+    background-color: #ffffff;
+    border-top: 1px solid #f0f0f0;
+  }
   .comment-edit-box {
     /* 容器样式 */
     .zan-container {
       position: relative;
       display: inline-block;
       text-align: center;
-      color: white;
+      color: var(--theme-text);
       /* 点赞图标基础样式 */
       .zan-icon {
         transition: opacity 0.3s ease; /* 平滑透明度变化 */
@@ -290,7 +318,7 @@ onMounted(() => {
       position: relative;
       display: inline-block;
       text-align: center;
-      color: white;
+      color: var(--theme-text);
 
       /* 未收藏状态 */
       .collect-icon:not(.collected) {
@@ -311,7 +339,7 @@ onMounted(() => {
       position: relative;
       display: inline-block;
       text-align: center;
-      color: white;
+      color: var(--theme-text);
 
       .comment-icon {
         opacity: 0.7; /* 未收藏时稍暗 */

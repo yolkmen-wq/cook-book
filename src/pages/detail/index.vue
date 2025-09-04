@@ -9,6 +9,13 @@ const tabs = ["正文", "评论"];
 const currentTab = ref(0);
 const id = ref();
 
+// 主题类名
+const themeClass = computed(() => {
+  // 这里可以根据实际的主题状态来返回对应的类名
+  // 暂时默认返回浅色主题
+  return 'theme-light';
+});
+
 // 设备相关变量
 const deviceWidth = ref(0);
 const tabWidth = ref(0);
@@ -42,6 +49,15 @@ const handleSwiperChange = (e: any) => {
 // 处理返回按钮
 const handleBack = () => {
   uni.navigateBack();
+};
+
+// 处理评论刷新
+const commentRef = ref();
+const handleCommentRefresh = () => {
+  // 刷新评论列表
+  if (commentRef.value && commentRef.value.getCommentList) {
+    commentRef.value.getCommentList();
+  }
 };
 
 onLoad(async (options) => {
@@ -125,20 +141,24 @@ onMounted(async () => {
               <Content :id="id" />
             </view>
             <view class="default-content" v-if="tab === '评论'">
-              <Comment :id="id" />
+              <Comment :id="id" ref="commentRef" />
             </view>
           </slot>
         </scroll-view>
       </swiper-item>
     </swiper>
   </view>
-  <commentBox :id="id" />
+  <commentBox :id="id" @refresh="handleCommentRefresh" />
 </template>
 <style lang="scss" scoped>
 .container {
   width: 100%;
-  background: $uni-bg-color;
+  background: var(--theme-background);
   position: relative;
+  
+  &.theme-light {
+    background: #ffffff;
+  }
 }
 
 .custom-navbar {
@@ -151,7 +171,7 @@ onMounted(async () => {
 .nav-icon {
   margin-right: 20rpx;
   :deep(.u-icon__icon) {
-    color: $uni-text-color !important;
+    color: var(--theme-text) !important;
   }
 }
 
@@ -171,12 +191,12 @@ onMounted(async () => {
   align-items: center;
   justify-content: center;
   font-size: 32rpx;
-  color: #666;
+  color: var(--theme-text-secondary);
   transition: color 0.3s ease;
 
   &.active {
-    color: $uni-text-color;
-    font-weight: 500;
+    color: var(--theme-text);
+    font-weight: 600;
   }
 }
 
@@ -185,7 +205,7 @@ onMounted(async () => {
   bottom: -20rpx;
   left: 0;
   height: 6rpx;
-  background: #ff0000;
+  background: var(--theme-primary);
   border-radius: 6rpx;
 }
 
@@ -200,6 +220,6 @@ onMounted(async () => {
 .default-content {
   padding: 20rpx;
   text-align: center;
-  color: #666;
+  color: var(--theme-text-secondary);
 }
 </style>

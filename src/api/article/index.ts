@@ -77,3 +77,21 @@ export const getArticleDetail = (id : number) => {
 		method: "GET",
 	});
 };
+
+/** 创建文章 */
+export const createArticle = (data?: object) => {
+	return request<Result>({
+		url: "app/article/create",
+		data: data,
+		method: "POST",
+	});
+};
+
+/** 上传图片 */
+export const uploadImage = (filePath: string) => {
+	return request<Result>({
+		url: "app/upload/image",
+		filePath: filePath,
+		method: "POST",
+	});
+};

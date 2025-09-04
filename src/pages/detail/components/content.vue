@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import { onLoad } from "@dcloudio/uni-app";
 import { getAssetsImages, formatTimeDifference } from "@/utils";
 import { getArticleDetail } from "@/api/article";
@@ -14,6 +14,13 @@ const content = ref("");
 const author = ref("");
 const createdTime = ref("");
 const tags = ref([]);
+
+// 主题类名
+const themeClass = computed(() => {
+  // 这里可以根据实际的主题状态来返回对应的类名
+  // 暂时默认返回浅色主题
+  return 'theme-light';
+});
 onMounted(() => {
   getArticleDetail(props.id).then((res) => {
     title.value = res.data.title;
@@ -40,46 +47,64 @@ onMounted(() => {
   </view>
 </template>
 <style lang="scss" scoped>
-.title {
-  color: $uni-text-color;
-   font-size: 32rpx;
-  font-weight: bold;
-  margin-bottom: 10px;
-  text-align: left;
+.content {
+  background-color: var(--theme-background);
+  padding: 32rpx;
+  
+  &.theme-light {
+    background-color: #ffffff;
+  }
 }
+
+.title {
+  color: var(--theme-text);
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 24rpx;
+  text-align: left;
+  line-height: 1.4;
+}
+
 .user-info {
   display: flex;
   align-items: center;
-  margin-bottom: 10px;
+  margin-bottom: 24rpx;
   text-align: left;
 }
+
 .user-avatar {
-  margin-right: 10px;
+  margin-right: 16rpx;
 }
+
 .avatar {
-  width: 48rpx;
-  height: 48rpx;
+  width: 64rpx;
+  height: 64rpx;
   border-radius: 50%;
 }
+
 .user-name {
-  color: $uni-text-color;
-  font-size: 26rpx;
-  font-weight: bold;
+  color: var(--theme-text);
+  font-size: 28rpx;
+  font-weight: 600;
+  margin-bottom: 4rpx;
 }
+
 .user-time {
   font-size: 24rpx;
-  color: #999;
+  color: var(--theme-text-secondary);
 }
+
 .article-tags {
-  margin-bottom: 10px;
+  margin-bottom: 32rpx;
   font-size: 24rpx;
-  color: #999;
+  color: var(--theme-text-secondary);
   text-align: left;
 }
+
 .content-text {
-  color: $uni-text-color;
-  font-size: 28rpx;
-  line-height: 1.5;
+  color: var(--theme-text);
+  font-size: 30rpx;
+  line-height: 1.6;
   text-align: left;
 }
 </style>

@@ -1,11 +1,17 @@
 <script lang="ts" setup>
 import { onShow } from "@dcloudio/uni-app";
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import { getAssetsImages } from "@/utils";
 import loginModal from "./loginModal.vue";
 import themeModal from "./themeModal.vue";
+import AiAssistant from "@/components/ai-assistant/ai-assistant.vue";
 import { useTheme } from "@/utils/theme";
-const { themeColors } = useTheme();
+const { themeColors, currentTheme } = useTheme();
+
+// 主题类名
+const themeClass = computed(() => {
+  return `theme-${currentTheme.value}`;
+});
 const personalCenterList = ref([
   {
     title: "我的收藏",
@@ -20,7 +26,7 @@ const personalCenterList = ref([
   {
     title: "发表文章",
     icon: "my/icon_publish",
-    url: "/pages/sign/index",
+    url: "/pages/publish/index",
   },
   {
     title: "签到",
@@ -62,9 +68,9 @@ const login = () => {
 };
 
 // 选择头像
-const onChooseAvatar = (e: Event) => {
+const onChooseAvatar = (e: any) => {
   console.log("onChooseAvatar", e);
-  avatar.value = (e.detail as any).avatarUrl;
+  avatar.value = e.detail.avatarUrl;
 };
 
 // 跳转页面
@@ -221,6 +227,7 @@ const clearStorage = () => {
     <!-- 主题色弹窗 -->
     <themeModal v-model="showThemeModal" />
   </view>
+  <AiAssistant />
 </template>
 <style lang="scss" scoped>
 .page-head {
@@ -255,7 +262,7 @@ const clearStorage = () => {
 .page-body {
   padding: 16rpx;
   background-color: $uni-bg-color;
-  color: $uni-text-color-inverse;
+  color: #333333;
 
   .personal-center {
     display: flex;
@@ -293,7 +300,7 @@ const clearStorage = () => {
   }
 
   :deep(.u-cell__title-text) {
-    color: $uni-text-color-inverse!important;
+    color: #333333!important;
   }
 }
 </style>

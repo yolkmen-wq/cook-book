@@ -43,4 +43,5 @@ const request = <T>(config: RequestConfig): Promise<T> => {
   });
 };
 
+export { request };
 export default request;

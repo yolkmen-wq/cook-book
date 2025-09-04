@@ -2,11 +2,28 @@
 import { onLaunch, onShow, onHide } from "@dcloudio/uni-app";
 import { themeManager, useTheme } from "@/utils/theme";
 import { getWxLogin } from "@/api/user";
+import { appControlManager } from "@/utils/appControl";
+import "@/utils/routeGuard"; // 引入路由守卫
 
 export default {
-  onLaunch() {
-    console.log("App Launch");
+  async onLaunch() {
+    console.log("App Launch",appControlManager);
 
+    // 初始化应用控制状态
+    await appControlManager.fetchDisplayMode();
+    
+    // 根据应用状态决定启动页面
+    if (appControlManager.isCalculatorMode()) {
+      // 计算器模式下直接跳转到计算器页面
+      uni.reLaunch({
+        url: '/pages/calculator/index'
+      });
+    }else{
+      uni.switchTab({
+        url: '/pages/tabBar/home/index'
+      })
+    }
+    
     // 初始化主题系统
     themeManager.init();
     // 在H5平台监听系统主题变化

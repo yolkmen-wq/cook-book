@@ -1,3 +1,25 @@
+<script lang="ts" setup>
+import { ref } from "vue";
+const defaultSelected = ref(2);
+const list = ref([
+  { id: 1, title: "水果" },
+  { id: 2, title: "蔬菜" },
+  { id: 3, title: "肉类" },
+  { id: 4, title: "海鲜" },
+  { id: 5, title: "酒水" },
+  { id: 6, title: "饮料" },
+  { id: 7, title: "零食" },
+  { id: 8, title: "水果" },
+  { id: 9, title: "蔬菜" },
+  { id: 10, title: "肉类" },
+  { id: 11, title: "海鲜" },
+  { id: 12, title: "酒水" },
+  { id: 13, title: "饮料" },
+  { id: 14, title: "零食" },
+  { id: 15, title: "水果" },
+]);
+</script>
+
 <template>
   <view class="app-page">
     <view class="flex-1 mx-n6 round-4 overflow">
@@ -39,27 +61,7 @@
   </view>
 </template>
 
-<script lang="ts" setup>
-import { ref } from "vue";
-const defaultSelected = ref(2);
-const list = ref([
-  { id: 1, title: "水果" },
-  { id: 2, title: "蔬菜" },
-  { id: 3, title: "肉类" },
-  { id: 4, title: "海鲜" },
-  { id: 5, title: "酒水" },
-  { id: 6, title: "饮料" },
-  { id: 7, title: "零食" },
-  { id: 8, title: "水果" },
-  { id: 9, title: "蔬菜" },
-  { id: 10, title: "肉类" },
-  { id: 11, title: "海鲜" },
-  { id: 12, title: "酒水" },
-  { id: 13, title: "饮料" },
-  { id: 14, title: "零食" },
-  { id: 15, title: "水果" },
-]);
-</script>
+
 
 <style lang="scss" scoped>
 body {

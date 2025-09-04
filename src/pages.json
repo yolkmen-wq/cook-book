@@ -11,6 +11,13 @@
   "pages": [
     //pages数组中第一项表示应用启动页，参考：https://uniapp.dcloud.io/collocation/pages
     {
+      "path": "pages/calculator/index",
+      "style": {
+        "navigationBarTitleText": "计算器",
+        "navigationStyle": "custom"
+      }
+    },
+    {
       "path": "pages/tabBar/home/index",
       "style": {
         "navigationStyle": "custom"
@@ -42,6 +49,12 @@
     },
     {
       "path": "pages/detail/index",
+      "style": {
+        "navigationStyle": "custom"
+      }
+    },
+    {
+      "path": "pages/publish/index",
       "style": {
         "navigationStyle": "custom"
       }

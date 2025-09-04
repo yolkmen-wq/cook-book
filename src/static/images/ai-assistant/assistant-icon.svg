@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 机器人头部 -->
+  <circle cx="32" cy="32" r="28" fill="#FFFFFF" stroke="#6A11CB" stroke-width="2"/>
+  
+  <!-- 机器人眼睛 -->
+  <circle cx="22" cy="28" r="5" fill="#2575FC"/>
+  <circle cx="42" cy="28" r="5" fill="#2575FC"/>
+  
+  <!-- 眼睛高光 -->
+  <circle cx="24" cy="26" r="2" fill="#FFFFFF"/>
+  <circle cx="44" cy="26" r="2" fill="#FFFFFF"/>
+  
+  <!-- 机器人嘴巴 (微笑) -->
+  <path d="M22 40 Q32 48 42 40" stroke="#6A11CB" stroke-width="2" fill="none"/>
+  
+  <!-- 机器人天线 -->
+  <line x1="32" y1="4" x2="32" y2="10" stroke="#6A11CB" stroke-width="2"/>
+  <circle cx="32" cy="4" r="2" fill="#2575FC"/>
+  
+  <!-- 装饰元素 -->
+  <circle cx="12" cy="32" r="2" fill="#6A11CB"/>
+  <circle cx="52" cy="32" r="2" fill="#6A11CB"/>
+</svg>

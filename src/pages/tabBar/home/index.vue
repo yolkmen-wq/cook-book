@@ -1,8 +1,9 @@
 
 <script lang="ts" setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import eSwiper from "@/components/e-swiper/e-swiper.vue";
 import dayjs from "dayjs";
+import { useTheme } from "@/utils/theme";
 import {
   getArticles,
   getCarousels,
@@ -16,13 +17,27 @@ import type {
   CategoryListItem,
 } from "./types";
 
-const globalAppSettings = ref({});
+const { currentTheme } = useTheme();
+
+// 主题类名
+const themeClass = computed(() => {
+  return `theme-${currentTheme.value}`;
+});
+
+const globalAppSettings = ref<GlobalAppSettings | {}>({});
 const keywords = ref("");
 const statusBarHeight = ref(0); // 状态栏高度
 
+interface GlobalAppSettings {
+  banner: {
+    dotPosition: string;
+    useDot: boolean;
+  };
+}
+
 const getGlobalAppSettings = () => {
   // TODO: get global app settings from server
-  globalAppSettings.value = {
+  (globalAppSettings.value as GlobalAppSettings) = {
     banner: {
       dotPosition: "right",
       useDot: true,
@@ -39,11 +54,17 @@ const fnOnBannerClick = (item: BannerListItem) => {
   });
 };
 
+interface CarouselItem {
+  id: number;
+  imageUrl: string;
+  keyWord: string | number;
+}
+
 const getBannerList = async () => {
   // TODO: get banner list from server
   const res = await getCarousels(0);
-  const list = res.data;
-  bannerList.value = list.map((v) => {
+  const list = res.data as CarouselItem[];
+  bannerList.value = list.map((v: CarouselItem) => {
     return {
       image: v.imageUrl,
       bannerId: v.id,
@@ -129,9 +150,9 @@ onMounted(() => {
           v-if="bannerList.length !== 0"
         >
           <e-swiper
-            :dotPosition="globalAppSettings.banner.dotPosition"
+            :dotPosition="(globalAppSettings as GlobalAppSettings).banner?.dotPosition || 'right'"
             :autoplay="true"
-            :useDot="globalAppSettings.banner.useDot"
+            :useDot="(globalAppSettings as GlobalAppSettings).banner?.useDot || true"
             :list="bannerList"
             @on-click="fnOnBannerClick"
           ></e-swiper>
@@ -155,7 +176,7 @@ onMounted(() => {
             >
               <image class="category-cover" :src="item.categoryPic" />
               <view class="category-name pl-16 pr-16 pb-16">{{
-                item.name
+                item.categoryName
               }}</view>
               <view class="category-count text-size-n"
                 >{{ item.articleNum }}篇</view

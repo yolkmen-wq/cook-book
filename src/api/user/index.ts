@@ -102,3 +102,11 @@ export const getCaptcha = (data?: object) => {
     method: "POST",
   });
 };
+
+/** 获取页面控制配置 */
+export const getAppControl = (data?: object) => {
+  return request<CaptchaResult>({
+    url: "app/getPageControl",
+    method: "GET",
+  });
+};
