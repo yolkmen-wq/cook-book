@@ -59,21 +59,16 @@
     "@emoji-mart/data": "^1.2.1",
     "@lucky-canvas/mini": "^0.0.7",
     "@lucky-canvas/uni": "^0.0.14",
-    "clipboard": "^2.0.11",
     "dart-sass": "^1.25.0",
     "dayjs": "^1.11.13",
-    "emoji-mart": "^5.6.0",
     "lodash": "^4.17.21",
     "lucky-canvas": "^1.7.27",
     "mockjs": "^1.1.0",
     "pinia": "^2.3.0",
     "pnpm": "^10.13.1",
-    "random": "^5.1.1",
     "sass": "^1.83.3",
     "uview-plus": "^3.4.41",
-    "uview-ui": "^2.0.38",
-    "vue": "^3.4.21",
-    "vue-i18n": "^9.1.9"
+    "vue": "^3.4.21"
   },
   "devDependencies": {
     "@dcloudio/types": "^3.4.8",

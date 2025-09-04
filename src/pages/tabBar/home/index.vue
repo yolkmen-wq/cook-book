@@ -139,7 +139,7 @@ onMounted(() => {
     <view
       class="page-head center flex justify-start items-center flex-row-center-start"
     >
-      <image class="avatar" src="../../../static/images/avatar/animal4.jpg" />
+      <image class="avatar" src="../../../static/images/avatar/animal.jpg" />
       <up-search class="search-input" placeholder="请输入搜索关键词" v-model="keywords"> </up-search>
     </view>
     <view class="page-body">

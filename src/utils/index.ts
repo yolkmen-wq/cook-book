@@ -17,14 +17,7 @@ export const getAssetsImages = computed(() => (name: string, type = "png") => {
   }
 });
 
-export const derangedArray = function (arr: any[]) {
-  for (
-    var j, x, i = arr.length;
-    i;
-    j = Math.floor(Math.random() * i), x = arr[--i], arr[i] = arr[j], arr[j] = x
-  );
-  return arr;
-};
+// 已删除未使用的derangedArray函数
 
 /** 格式化token（jwt格式） */
 export const formatToken = (token: string): string => {

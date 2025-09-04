@@ -10,8 +10,10 @@ const inputMessage = ref('');
 const scrollTop = ref(0); // 用于控制scroll-view的滚动位置
 const scrollKey = ref(0); // 用于强制更新scroll-view
 const isTyping = ref(false); // 控制AI是否正在回复中
-const socketTask = ref(null); // 存储WebSocket连接
+const socketTask = ref<UniApp.SocketTask | null>(null); // 存储WebSocket连接
 const currentStreamingMessage = ref(''); // 存储当前正在流式输出的消息
+const isUserStopped = ref(false); // 标记用户是否主动停止
+const isConnected = ref(false); // 标记WebSocket是否已连接
 
 // 主题类名
 const themeClass = computed(() => {
@@ -45,10 +47,56 @@ const smoothScrollToBottom = () => {
 };
 
 // 超时定时器
-let typingTimeout = null;
+let typingTimeout: NodeJS.Timeout | null = null;
+// 内容检测定时器
+let contentCheckTimeout: NodeJS.Timeout | null = null;
+// 上次内容长度
+let lastContentLength = 0;
+
+// 检查WebSocket连接状态
+const isWebSocketConnected = () => {
+  // uni-app的SocketTask没有readyState属性，需要通过连接状态标志来判断
+  return socketTask.value !== null && isConnected.value;
+};
 
 // 发送消息到WebSocket服务器
 const sendMessage = () => {
+  if (!inputMessage.value.trim() || isTyping.value) return;
+  
+  // 重置用户停止标志，允许正常连接和重连
+  isUserStopped.value = false;
+  
+  // 如果WebSocket未连接，重新开启连接
+  if (!isWebSocketConnected()) {
+    console.log('WebSocket未连接，正在重新开启连接...');
+    initWebSocket();
+    // 等待连接建立后再发送消息，使用更长的等待时间和重试机制
+    let retryCount = 0;
+    const maxRetries = 5;
+    const checkConnection = () => {
+      if (isWebSocketConnected()) {
+        sendMessageInternal();
+      } else if (retryCount < maxRetries) {
+        retryCount++;
+        console.log(`等待连接建立中... (${retryCount}/${maxRetries})`);
+        setTimeout(checkConnection, 500);
+      } else {
+        console.error('WebSocket连接失败');
+        uni.showToast({
+          title: '连接失败，请重试',
+          icon: 'none'
+        });
+      }
+    };
+    setTimeout(checkConnection, 500);
+    return;
+  }
+  
+  sendMessageInternal();
+};
+
+// 内部发送消息函数
+const sendMessageInternal = () => {
   if (!inputMessage.value.trim() || !socketTask.value || isTyping.value) return;
 
   // 添加用户消息
@@ -94,7 +142,8 @@ const sendMessage = () => {
   // 发送消息到WebSocket服务器
   const messageObj = {
     message: currentMessage,
-    provider: "deepseek" // 可以根据需要修改模型提供商
+    provider: "deepseek",// 可以根据需要修改模型提供商
+    action:'chat'
   };
 
   socketTask.value.send({
@@ -102,7 +151,7 @@ const sendMessage = () => {
     success: () => {
       console.log('消息发送成功');
     },
-    fail: (error) => {
+    fail: (error: any) => {
       console.error('消息发送失败:', error);
       // 发送失败时更新最后一条消息
       const lastMessage = messages.value[messages.value.length - 1];
@@ -120,7 +169,7 @@ const sendMessage = () => {
 };
 
 // 防抖滚动函数
-let scrollDebounceTimer = null;
+let scrollDebounceTimer: NodeJS.Timeout | null = null;
 const debouncedScrollToBottom = () => {
   if (scrollDebounceTimer) {
     clearTimeout(scrollDebounceTimer);
@@ -138,6 +187,11 @@ const debouncedScrollToBottom = () => {
 // 监听当前流式消息的变化，更新最后一条助手消息并实时滚动
 watch(currentStreamingMessage, (newValue, oldValue) => {
   console.log('流式消息变化:', { newValue, oldValue });
+  // 只有在typing状态下才更新消息内容
+  if (!isTyping.value) {
+    console.log('不在typing状态，忽略流式消息更新');
+    return;
+  }
   const lastMessage = messages.value[messages.value.length - 1];
   if (lastMessage && lastMessage.role === 'assistant' && newValue) {
     lastMessage.content = newValue;
@@ -148,7 +202,13 @@ watch(currentStreamingMessage, (newValue, oldValue) => {
 }, { flush: 'post', immediate: true }); // 确保DOM更新后再执行，立即执行一次
 
 // 处理收到的WebSocket消息
-const handleWebSocketMessage = (data) => {
+const handleWebSocketMessage = (data: string) => {
+  // 如果不在typing状态或用户已停止，忽略所有消息
+  if (!isTyping.value || isUserStopped.value) {
+    console.log('不在typing状态或用户已停止，忽略消息:', data);
+    return;
+  }
+  
   try {
     const response = JSON.parse(data);
     console.log('收到WebSocket响应:', response);
@@ -156,22 +216,42 @@ const handleWebSocketMessage = (data) => {
     let hasNewContent = false;
 
     // 根据实际的WebSocket响应格式进行处理
-    // 支持多种可能的字段名
-    if (response.content) {
-      currentStreamingMessage.value += response.content;
-      hasNewContent = true;
-    } else if (response.text) {
-      currentStreamingMessage.value += response.text;
-      hasNewContent = true;
-    } else if (response.message) {
-      currentStreamingMessage.value += response.message;
-      hasNewContent = true;
+    // 支持多种可能的字段名，但只有在typing状态下才拼接内容
+    if (isTyping.value) {
+      if (response.content) {
+        currentStreamingMessage.value += response.content;
+        hasNewContent = true;
+      } else if (response.text) {
+        currentStreamingMessage.value += response.text;
+        hasNewContent = true;
+      } else if (response.message) {
+        currentStreamingMessage.value += response.message;
+        hasNewContent = true;
+      }
     }
 
     // 如果有新内容，立即触发滚动（不依赖watch，确保实时性）
     if (hasNewContent) {
       console.log('检测到新内容，触发滚动，当前消息长度:', currentStreamingMessage.value.length);
       debouncedScrollToBottom();
+      
+      // 更新内容长度并重置检测定时器
+      lastContentLength = currentStreamingMessage.value.length;
+      if (contentCheckTimeout) {
+        clearTimeout(contentCheckTimeout);
+      }
+      // 设置内容检测定时器，如果3秒内没有新内容，自动结束typing状态
+      contentCheckTimeout = setTimeout(() => {
+        if (isTyping.value && currentStreamingMessage.value.length === lastContentLength) {
+          console.log('检测到内容停止增长，自动结束typing状态');
+          isTyping.value = false;
+          if (typingTimeout) {
+            clearTimeout(typingTimeout);
+            typingTimeout = null;
+          }
+          scrollToBottom();
+        }
+      }, 3000);
     }
 
     // 如果收到了结束标志，表示流式输出结束
@@ -188,36 +268,31 @@ const handleWebSocketMessage = (data) => {
     }
   } catch (error) {
     console.error('解析WebSocket消息失败:', error);
-    // 如果无法解析JSON，可能是纯文本消息，直接添加
-    currentStreamingMessage.value += data;
-    // 触发滚动
-    debouncedScrollToBottom();
-    // 对于纯文本消息，设置一个短暂的延迟后结束typing状态
-    setTimeout(() => {
-      if (isTyping.value) {
-        isTyping.value = false;
-        // 清除超时定时器
-        if (typingTimeout) {
-          clearTimeout(typingTimeout);
-          typingTimeout = null;
+    // 如果无法解析JSON，可能是纯文本消息，但只有在typing状态下才处理
+    if (isTyping.value) {
+      currentStreamingMessage.value += data;
+      // 触发滚动
+      debouncedScrollToBottom();
+      // 对于纯文本消息，设置一个短暂的延迟后结束typing状态
+      setTimeout(() => {
+        if (isTyping.value) {
+          isTyping.value = false;
+          // 清除超时定时器
+          if (typingTimeout) {
+            clearTimeout(typingTimeout);
+            typingTimeout = null;
+          }
+          // 最终滚动到底部
+          scrollToBottom();
+          console.log('纯文本消息处理完成，结束typing状态');
         }
-        // 最终滚动到底部
-        scrollToBottom();
-        console.log('纯文本消息处理完成，结束typing状态');
-      }
-    }, 1000);
+      }, 200);
+    } else {
+      console.log('不在typing状态，忽略纯文本消息:', data);
+    }
   }
 };
 
-// 手动重置typing状态的函数
-const resetTypingState = () => {
-  isTyping.value = false;
-  if (typingTimeout) {
-    clearTimeout(typingTimeout);
-    typingTimeout = null;
-  }
-  console.log('手动重置typing状态');
-};
 
 // 处理发送或停止的统一函数
 const handleSendOrStop = () => {
@@ -234,13 +309,16 @@ const handleSendOrStop = () => {
 // 停止AI生成的函数
 const stopAIGeneration = () => {
   console.log('用户主动停止AI生成');
-  
-  // 关闭WebSocket连接以停止接收数据
-  if (socketTask.value) {
-    socketTask.value.close();
+  const messageObj = {
+    action:'stop'
   }
+    socketTask.value.send({
+    data: JSON.stringify(messageObj),
+    })
+  // 设置用户主动停止标志，防止自动重连
+  isUserStopped.value = true;
   
-  // 重置状态
+  // 立即重置状态，防止继续处理消息
   isTyping.value = false;
   
   // 清除超时定时器
@@ -248,28 +326,69 @@ const stopAIGeneration = () => {
     clearTimeout(typingTimeout);
     typingTimeout = null;
   }
+  if (contentCheckTimeout) {
+    clearTimeout(contentCheckTimeout);
+    contentCheckTimeout = null;
+  }
   
-  // 如果当前有未完成的消息，添加停止标识
+  // 立即处理最后一条消息，添加停止标识
   const lastMessage = messages.value[messages.value.length - 1];
   if (lastMessage && lastMessage.role === 'assistant') {
-    if (!lastMessage.content || lastMessage.content === '') {
+    // 保存当前已生成的内容
+    const currentContent = currentStreamingMessage.value || lastMessage.content || '';
+    if (!currentContent || currentContent === '') {
       lastMessage.content = '生成已停止';
     } else {
-      lastMessage.content += '\n\n[生成已停止]';
+      lastMessage.content = currentContent + '\n\n[生成已停止]';
     }
   }
   
-  // 重新建立WebSocket连接
-  setTimeout(() => {
-    initWebSocket();
-  }, 1000);
+  // 清除当前流式消息（在处理完最后消息后）
+  currentStreamingMessage.value = '';
+  
+  // 强制关闭WebSocket连接以停止AI生成
+  if (socketTask.value) {
+    try {
+      // 检查连接是否仍然有效
+      if (typeof socketTask.value.close === 'function') {
+        // 强制关闭连接，使用1000状态码表示正常关闭
+        socketTask.value.close({
+          code: 1000,
+          reason: '用户主动停止'
+        });
+        console.log('WebSocket连接已强制关闭');
+      }
+    } catch (e) {
+      console.log('关闭WebSocket连接时出错:', e);
+    }
+    socketTask.value = null;
+    isConnected.value = false;
+  }
+  
+  console.log('AI生成已完全停止');
 };
 
 // 初始化WebSocket连接
 const initWebSocket = () => {
+  // 如果已有连接，先关闭
+  if (socketTask.value) {
+    try {
+      // 检查连接是否仍然有效
+      if (typeof socketTask.value.close === 'function') {
+        socketTask.value.close({
+          code: 1000,
+          reason: '重新连接'
+        });
+      }
+    } catch (e) {
+      console.log('关闭旧连接时出错:', e);
+    }
+  }
+  
   // 创建WebSocket连接
   socketTask.value = uni.connectSocket({
-    url: 'ws://127.0.0.1:7575/chat-ws', // WebSocket服务器地址
+    url: 'wss://test.yolkmen.com/chat-ws', // WebSocket服务器地址
+    // url: 'ws://127.0.0.1:7575/chat-ws', // WebSocket服务器地址
     complete: () => {
       console.log('WebSocket连接请求已完成');
     }
@@ -278,6 +397,7 @@ const initWebSocket = () => {
   // 监听WebSocket连接打开事件
   socketTask.value.onOpen(() => {
     console.log('WebSocket连接已打开');
+    isConnected.value = true;
   });
 
   // 监听WebSocket消息
@@ -287,13 +407,38 @@ const initWebSocket = () => {
   });
 
   // 监听WebSocket连接关闭事件
-  socketTask.value.onClose(() => {
-    console.log('WebSocket连接关闭');
+  socketTask.value.onClose((res) => {
+    console.log('WebSocket连接关闭:', res);
+    isConnected.value = false;
+    // 只有在非用户主动停止且连接异常关闭时才重连
+    if (!isUserStopped.value && (!res.code || (res.code !== 1000 && res.code !== 1001))) {
+      console.log('连接异常关闭，准备重连');
+      setTimeout(() => {
+        if (!isTyping.value && !isUserStopped.value) {
+          console.log('开始重连WebSocket');
+          initWebSocket();
+        }
+      }, 2000);
+    } else if (isUserStopped.value) {
+      console.log('用户主动停止，不进行重连');
+    }
   });
 
   // 监听WebSocket错误事件
   socketTask.value.onError((error) => {
     console.error('WebSocket连接错误:', error);
+    isConnected.value = false;
+    // 只有在非用户主动停止时才重连
+    if (!isUserStopped.value) {
+      setTimeout(() => {
+        if (!isTyping.value && !isUserStopped.value) {
+          console.log('连接错误，开始重连WebSocket');
+          initWebSocket();
+        }
+      }, 3000);
+    } else {
+      console.log('用户主动停止，忽略连接错误重连');
+    }
   });
 };
 
@@ -311,12 +456,27 @@ onUnmounted(() => {
     clearTimeout(typingTimeout);
     typingTimeout = null;
   }
+  if (contentCheckTimeout) {
+    clearTimeout(contentCheckTimeout);
+    contentCheckTimeout = null;
+  }
   if (scrollDebounceTimer) {
     clearTimeout(scrollDebounceTimer);
     scrollDebounceTimer = null;
   }
   if (socketTask.value) {
-    socketTask.value.close();
+    try {
+      // 检查连接是否仍然有效
+      if (typeof socketTask.value.close === 'function') {
+        socketTask.value.close({
+          code: 1000,
+          reason: '组件卸载'
+        });
+      }
+    } catch (e) {
+      console.log('组件卸载时关闭WebSocket连接出错:', e);
+    }
+    socketTask.value = null;
   }
 });
 </script>
